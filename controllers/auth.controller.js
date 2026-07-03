@@ -1,3 +1,4 @@
+require("dotenv").config();
 const user = require ("../models/user");
 const bcrypt = require("bcrypt");
 
@@ -11,17 +12,17 @@ async function signup(req,res){
         return res.redirect("/user/signup");
     }
     if(!fullnameRegex.test(fullname)){
-        return res.redirect("/user/signup");
+        return res.redirect("/signup");
     }
     if(!emailRegex.test(email)){
-        return res.redirect("/user/signup");
+        return res.redirect("/signup");
     }
     if(!passwordRegex.test(password)){
-        return res.redirect("/user/signup");
+        return res.redirect("/signup");
     }
     let User = await user.findOne({email});
     if(User){
-        return res.redirect("/user/signup");
+        return res.redirect("/signup");
     }
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password,salt);
@@ -41,16 +42,33 @@ async function signup(req,res){
         res.redirect("/");
     }
     else{
-        return res.redirect("user/signup");
+        return res.redirect("/signup");
     }
 }
 
 
 async function login(req,res){
+    const {email,password} = req.body
+    const User = await user.findOne({email});
+    if(User){
+        const isPasswordMatched = await bcrypt.compare(password, User.password);
+        if(!isPasswordMatched) return res.redirect("/login");
+        const token = generateToken(User._id);
+        res.cookie("token", token, {
+            maxAge : 7*24*60*60*1000,
+            httpOnly: true,         
+            secure:process.env.NODE_ENV==="production", 
+            sameSite: "strict"
+        })
+        return res.redirect("/");
+    }
+    else{
+        return res.redirect("/login");
+    }
 
 }
 async function logout(req,res){
-
+    
 }
 
 
