@@ -4,14 +4,14 @@ const app = express();
 const {ConnectDB} = require ("./lib/db");
 const UserRouter = require ("./routes/user.route")
 const StaticRouter = require ("./routes/static.route");
-
+const cookieParser = require("cookie-parser");
 
 ConnectDB("mongodb://127.0.0.1:27017/password-Hashed").then(() => console.log("Mongodb running..."))
 
 
 
 app.use(express.json());
-
+app.use(cookieParser());
 
 
 app.use("/", StaticRouter)
