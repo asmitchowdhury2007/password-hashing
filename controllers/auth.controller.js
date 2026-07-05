@@ -1,7 +1,7 @@
 require("dotenv").config();
 const user = require ("../models/user");
 const bcrypt = require("bcrypt");
-
+const {generateToken} = require ("../lib/utils")
 
 async function signup(req,res){
     const {fullname,email,password} = req.body
